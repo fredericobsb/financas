@@ -1,0 +1,9 @@
+1) Crie o projeto com o comando:
+    npx react-native@0.72.2 init meuApp --version 0.72.2 
+
+2) Instale o react-navigation com o comando:
+        npm install @react-navigation/native
+
+3) Instale as bibliotecas:
+       npm install react-native-screens react-native-safe-area-context
+       npm install @react-navigation/native-stack
