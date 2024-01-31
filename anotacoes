@@ -11,3 +11,9 @@
 
 94) Cadastrando usuario
           npm install axios
+
+96) Criando pagina home
+          npm install @react-navigation/drawer
+
+          npm install react-native-gesture-handler react-native-reanimated
+

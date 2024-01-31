@@ -21,7 +21,7 @@ export default function SignUp() {
    
 
     function handleSignUp(){
-      if(nome === '' || email === '' || passowrd === ''){
+      if(nome === '' || email === '' || password === ''){
         return;
       }
       signUp(nome, email, password); 
