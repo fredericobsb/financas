@@ -16,6 +16,7 @@ function AuthProvider({ children }){
     async function loadStorage(){
       const storageUser = await AsyncStorage.getItem('@finToken');
       if(storageUser){
+        console.log( 'user do local storage no efffects ==> ', storageUser)
         const response = await api.get('/me', {
           headers: {
             'Authorization': `Bearer ${storageUser}`
@@ -28,6 +29,7 @@ function AuthProvider({ children }){
         api.defaults.headers['Authorization'] = `Bearer ${storageUser}`;
         setUser(response.data);
         console.log('-------- setei o usuario buscado da api no setUser ==> ', response.data);
+        console.log('----------- setei nome do usuario no user do contexto => ', {user});
         setLoading(false);
       }
       setLoading(false);
@@ -74,10 +76,18 @@ function AuthProvider({ children }){
       setLoadingAuth(false);
       console.log('------------- deu pau nessa porra. ERRO ==> ', err);
     }
-}
+  }
+
+  async function signOut(){
+    await AsyncStorage.clear()
+      .then(() =>{
+        console.log('---------- logout FUNFOU! -------------');
+        setUser(null);
+      })
+  }
 
   return(
-    <AuthContext.Provider value={{ signed: !!user, signUp, signIn, loadingAuth, loading }}>
+    <AuthContext.Provider value={{ signed: !!user, user, signUp, signIn, loadingAuth, loading, signOut}}>
       {children}
     </AuthContext.Provider>
   )
