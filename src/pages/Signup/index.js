@@ -24,7 +24,7 @@ export default function SignUp() {
       if(nome === '' || email === '' || password === ''){
         return;
       }
-      signUp(nome, email, password); 
+      signUp(email, password, nome); 
     }
 
     return(
