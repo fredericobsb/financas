@@ -1,21 +1,42 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import api from '../services/api';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const AuthContext = createContext({});
 
 function AuthProvider({ children }){
   const [user, setUser] = useState(null); 
   const [loadingAuth, setLoadingAuth] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const navigation = useNavigation();
 
+  useEffect(() =>{
+    async function loadStorage(){
+      const storageUser = await AsyncStorage.getItem('@finToken');
+      if(storageUser){
+        const response = await api.get('/me', {
+          headers: {
+            'Authorization': `Bearer ${storageUser}`
+          }
+        })
+        .catch(() =>{
+          console.log('------------catch do get da api');
+          setUser(null);
+        })
+        api.defaults.headers['Authorization'] = `Bearer ${storageUser}`;
+        setUser(response.data);
+        console.log('-------- setei o usuario buscado da api no setUser ==> ', response.data);
+        setLoading(false);
+      }
+      setLoading(false);
+    }
+    loadStorage();
+  },[])
+
   async function signUp(email, password, nome){
     setLoadingAuth(true);
-    console.log('----------- cchecando nome == ', nome);
-    console.log('----------- cchecando email == ', email);
-    console.log('----------- cchecando password == ', password);
-    
     try{
         const response = await api.post('/users', {
           name:nome,
@@ -31,9 +52,6 @@ function AuthProvider({ children }){
   }
 
   async function signIn(email,password){
-   console.log('--------- entrei na signIn de contexts.auth');
-   console.log('--------- email ==>', email);
-   console.log('--------- password ==>', password);
     setLoadingAuth(true);
     try{
        const response = await api.post('/login', {
@@ -44,7 +62,9 @@ function AuthProvider({ children }){
        const data = {
           id, name, token, email
        };
-       console.log('--------- ANTES DO HEADES 2345');
+       //salva os dados do usuario logado no Storage.
+       await AsyncStorage.setItem('@finToken', token);
+
        api.defaults.headers['Authorization'] = `Bearer ${token}`;
        setUser({id, name, email});
        setLoadingAuth(false);
@@ -57,7 +77,7 @@ function AuthProvider({ children }){
 }
 
   return(
-    <AuthContext.Provider value={{ signed: !!user, signUp, signIn, loadingAuth }}>
+    <AuthContext.Provider value={{ signed: !!user, signUp, signIn, loadingAuth, loading }}>
       {children}
     </AuthContext.Provider>
   )
